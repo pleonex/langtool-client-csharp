@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>LanguageTool REST API .NET client</Description>
+    <IsPackable>true</IsPackable>
+
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>PleOps.LanguageTool.Client</RootNamespace>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- Ignore documentation warnings from generated code -->
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="languagetool-swagger.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Kiota.Bundle" />
+  </ItemGroup>
+
+  <Target Name="GenerateClient" BeforeTargets="BeforeCompile;CoreCompile" Inputs="languagetool-swagger.json" Outputs="$(IntermediateOutputPath)InternalClient/**/*.cs">
+
+    <Message Text="Generating client with Kiota" Importance="high" />
+    <Exec Command="dotnet tool restore" />
+    <Exec Command="dotnet tool run kiota generate --openapi languagetool-swagger.json --language csharp --output $(IntermediateOutputPath)InternalClient --class-name InternalLanguageToolClient --namespace-name PleOps.LanguageTool.Client --exclude-backward-compatible --log-level error" />
+
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)InternalClient/**/*.cs" />
+      <FileWrites Include="$(IntermediateOutputPath)InternalClient/**/*.cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>
