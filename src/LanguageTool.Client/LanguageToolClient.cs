@@ -16,15 +16,21 @@ using PleOps.LanguageTool.Client.Check;
 public class LanguageToolClient
 {
     private readonly InternalLanguageToolClient client;
-    private readonly ConcurrentBag<string> userDictionary;
+    private readonly ConcurrentDictionary<string, int> userDictionary;
 
     internal LanguageToolClient(InternalLanguageToolClient client)
     {
         ArgumentNullException.ThrowIfNull(client);
         this.client = client;
 
-        userDictionary = new ConcurrentBag<string>();
+        // Use dictionary because it's the only type to support fast concurrent remove.
+        userDictionary = new ConcurrentDictionary<string, int>();
     }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to ignore the case when comparing words in the user dictionary.
+    /// </summary>
+    public bool IgnoreUserDictionaryCase { get; set; }
 
     /// <summary>
     /// Add a word to the current in-memory dictionary.
@@ -34,12 +40,22 @@ public class LanguageToolClient
     public void AddUserWords(params string[] words)
     {
         foreach (string word in words) {
-            userDictionary.Add(word);
+            userDictionary[word] = 0;
         }
     }
 
     /// <summary>
-    /// Add the lines from the text file in the in-memory dictionary.
+    /// Remove word from the current in-memory dictionary.
+    /// </summary>
+    /// <param name="words">The words to be removed.</param>
+    public void RemoveUserWords(params string[] words) {
+        foreach (string word in words) {
+            userDictionary.TryRemove(word, out int _);
+        }
+    }
+
+    /// <summary>
+    /// Add the lines from the text file in the current in-memory dictionary.
     /// </summary>
     /// <param name="dictionaryPath">Path to the text file with the user words.</param>
     /// <remarks>
@@ -53,7 +69,7 @@ public class LanguageToolClient
             .Where(l => l.Length > 0 && !l.StartsWith('#'));
 
         foreach (string word in words) {
-            userDictionary.Add(word);
+            userDictionary[word] = 0;
         }
     }
 
@@ -87,12 +103,24 @@ public class LanguageToolClient
 
         // Ignore matches due to words in the user dictionary.
         var textCulture = new CultureInfo(response.Language!.Code!);
-        var comparer = StringComparer.Create(textCulture, false);
+        var comparer = StringComparer.Create(textCulture, ignoreCase: IgnoreUserDictionaryCase);
         var matches = response.Matches!
             .Where(m => {
                 string matchContent = text.Substring(m.Offset!.Value, m.Length!.Value);
-                return !userDictionary.Contains(matchContent, comparer);
+                return !userDictionary.Keys.Contains(matchContent, comparer);
             });
         return new ReadOnlyCollection<CheckPostResponse_matches>(matches.ToArray());
+    }
+
+    /// <summary>
+    /// Get a list of supported languages.
+    /// </summary>
+    /// <returns>An array of language objects.</returns>
+    public async Task<IEnumerable<LanguageInfo>> GetSupportedLanguagesAsync()
+    {
+        List<Languages.Languages> response = await client.Languages.GetAsync()
+            ?? throw new InvalidOperationException("Invalid response data");
+
+        return response.Select(l => new LanguageInfo(l.Name!, l.Code!, l.LongCode!));
     }
 }
