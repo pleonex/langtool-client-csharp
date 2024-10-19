@@ -8,8 +8,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using PleOps.LanguageTool.Client.Check;
-using PleOps.LanguageTool.Client.Languages;
-using static System.Net.Mime.MediaTypeNames;
 
 /// <summary>
 /// LanguageTool REST API client.
@@ -30,9 +28,9 @@ public class LanguageToolClient
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to ignore the case when comparing words in the user dictionary.
+    /// Gets or sets a value indicating whether to the user's dictionary is case sensitive for ignoring matching words.
     /// </summary>
-    public bool IgnoreUserDictionaryCase { get; set; }
+    public bool UserDictionaryCaseSensitive { get; set; }
 
     /// <summary>
     /// Gets the current in-memory user dictionary.
@@ -167,7 +165,7 @@ public class LanguageToolClient
     private IEnumerable<CheckPostResponse_matches> FilterMatchesFromDictionary(CheckPostResponse response, string input)
     {
         var textCulture = new CultureInfo(response.Language!.Code!);
-        var comparer = StringComparer.Create(textCulture, ignoreCase: IgnoreUserDictionaryCase);
+        var comparer = StringComparer.Create(textCulture, ignoreCase: !UserDictionaryCaseSensitive);
         IEnumerable<CheckPostResponse_matches> matches = response.Matches!
             .Where(m => {
                 // Not sure, to be verified.
