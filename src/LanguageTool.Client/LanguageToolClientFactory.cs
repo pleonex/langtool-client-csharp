@@ -3,6 +3,7 @@
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary;
+using PleOps.LanguageTool.Client.Generated;
 
 /// <summary>
 /// Static factory of LanguageTool clients.
@@ -36,7 +37,7 @@ public static class LanguageToolClientFactory
         var authProvider = new AnonymousAuthenticationProvider();
         var adapter = new HttpClientRequestAdapter(authProvider, httpClient: httpClient);
 
-        var internalClient = new InternalLanguageToolClient(adapter);
+        var internalClient = new GeneratedLanguageToolClient(adapter);
         return new LanguageToolClient(internalClient);
     }
 }

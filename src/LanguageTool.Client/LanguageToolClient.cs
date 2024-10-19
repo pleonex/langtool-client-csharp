@@ -3,22 +3,27 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using PleOps.LanguageTool.Client.Check;
+using PleOps.LanguageTool.Client.Generated;
+using PleOps.LanguageTool.Client.Generated.Check;
+using PleOps.LanguageTool.Client.Generated.Languages;
+using PleOps.LanguageTool.Client.TextCheck;
 
 /// <summary>
 /// LanguageTool REST API client.
 /// </summary>
-/// <remarks>This a wrapper over the generated REST client from its OpenAPI specification.</remarks>
+/// <remarks>
+/// This a wrapper over the generated REST client from its OpenAPI specification.
+/// It does not support Premium features from the cloud version.
+/// </remarks>
 public class LanguageToolClient
 {
-    private readonly InternalLanguageToolClient client;
+    private readonly GeneratedLanguageToolClient client;
     private readonly ConcurrentDictionary<string, int> userDictionary;
 
-    internal LanguageToolClient(InternalLanguageToolClient client)
+    internal LanguageToolClient(GeneratedLanguageToolClient client)
     {
         ArgumentNullException.ThrowIfNull(client);
         this.client = client;
@@ -55,7 +60,7 @@ public class LanguageToolClient
     /// <param name="words">The words to be removed.</param>
     public void RemoveUserWords(params string[] words) {
         foreach (string word in words) {
-            userDictionary.TryRemove(word, out int _);
+            _ = userDictionary.TryRemove(word, out int _);
         }
     }
 
@@ -92,16 +97,16 @@ public class LanguageToolClient
     /// i.e. rules that you might only find useful when checking formal text.
     /// </param>
     /// <returns>A list of detected issues.</returns>
-    public async Task<ReadOnlyCollection<CheckPostResponse_matches>> CheckTextAsync(
+    public async Task<TextCheckResult> CheckPlainTextAsync(
         string text,
         string language,
         bool picky)
     {
-        var parameters = new CheckParameters {
+        var parameters = new TextCheckParameters {
             Language = language,
             Picky = picky,
         };
-        return await CheckTextAsync(text, parameters);
+        return await CheckPlainTextAsync(text, parameters);
     }
 
     /// <summary>
@@ -111,7 +116,7 @@ public class LanguageToolClient
     /// <param name="parameters">The parameters to run the check.</param>
     /// <returns>A list of detected issues.</returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task<ReadOnlyCollection<CheckPostResponse_matches>> CheckTextAsync(string text, CheckParameters parameters)
+    public async Task<TextCheckResult> CheckPlainTextAsync(string text, TextCheckParameters parameters)
     {
         CheckPostRequestBody body = parameters.ToRequestBody();
         body.Text = text;
@@ -120,9 +125,9 @@ public class LanguageToolClient
             ?? throw new InvalidOperationException("Invalid response data");
 
         // Ignore matches due to words in the user dictionary.
-        var matches = FilterMatchesFromDictionary(response, text);
+        IEnumerable<CheckPostResponse_matches> matches = FilterMatchesFromDictionary(response, text);
 
-        return new ReadOnlyCollection<CheckPostResponse_matches>(matches.ToArray());
+        return new TextCheckResult(response, matches);
     }
 
     /// <summary>
@@ -136,7 +141,7 @@ public class LanguageToolClient
     /// </param>
     /// <param name="parameters">The parameters to run the check.</param>
     /// <returns>A list of detected issues.</returns>
-    public async Task<ReadOnlyCollection<CheckPostResponse_matches>> CheckMarkupAsync(string jsonData, CheckParameters parameters)
+    public async Task<TextCheckResult> CheckMarkupTextAsync(string jsonData, TextCheckParameters parameters)
     {
         CheckPostRequestBody body = parameters.ToRequestBody();
         body.Data = jsonData;
@@ -145,9 +150,9 @@ public class LanguageToolClient
             ?? throw new InvalidOperationException("Invalid response data");
 
         // Ignore matches due to words in the user dictionary.
-        var matches = FilterMatchesFromDictionary(response, jsonData);
+        IEnumerable<CheckPostResponse_matches> matches = FilterMatchesFromDictionary(response, jsonData);
 
-        return new ReadOnlyCollection<CheckPostResponse_matches>(matches.ToArray());
+        return new TextCheckResult(response, matches);
     }
 
     /// <summary>
@@ -156,7 +161,7 @@ public class LanguageToolClient
     /// <returns>An array of language objects.</returns>
     public async Task<IEnumerable<LanguageInfo>> GetSupportedLanguagesAsync()
     {
-        List<Languages.Languages> response = await client.Languages.GetAsync()
+        List<Languages> response = await client.Languages.GetAsync()
             ?? throw new InvalidOperationException("Invalid response data");
 
         return response.Select(l => new LanguageInfo(l.Name!, l.Code!, l.LongCode!));

@@ -1,11 +1,11 @@
-﻿namespace PleOps.LanguageTool.Client;
+﻿namespace PleOps.LanguageTool.Client.TextCheck;
 
-using PleOps.LanguageTool.Client.Check;
+using PleOps.LanguageTool.Client.Generated.Check;
 
 /// <summary>
 /// Parameters to run the text checks.
 /// </summary>
-public record CheckParameters
+public record TextCheckParameters
 {
     /// <summary>
     /// Gets or sets a language code like `en-US`, `de-DE`, `fr`, or `auto` to guess the language automatically.

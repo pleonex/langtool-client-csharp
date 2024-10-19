@@ -27,7 +27,7 @@
 
     <Message Text="Generating client with Kiota" Importance="high" />
     <Exec Command="dotnet tool restore" />
-    <Exec Command="dotnet tool run kiota generate --openapi languagetool-swagger.json --language csharp --output $(IntermediateOutputPath)InternalClient --class-name InternalLanguageToolClient --namespace-name PleOps.LanguageTool.Client --exclude-backward-compatible --log-level error" />
+    <Exec Command="dotnet tool run kiota generate --openapi languagetool-swagger.json --language csharp --output $(IntermediateOutputPath)InternalClient --class-name GeneratedLanguageToolClient --namespace-name PleOps.LanguageTool.Client.Generated --type-access-modifier Internal --exclude-backward-compatible --log-level error" />
 
     <ItemGroup>
       <Compile Include="$(IntermediateOutputPath)InternalClient/**/*.cs" />
