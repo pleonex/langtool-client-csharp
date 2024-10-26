@@ -48,7 +48,7 @@ public class MarkupAnnotation
     /// <param name="markup">The markup content.</param>
     /// <param name="interpretAs">The plain text interpretation.</param>
     /// <returns>New annotation.</returns>
-    public static MarkupAnnotation CreateMarkup(string markup, string interpretAs)
+    public static MarkupAnnotation CreateMarkup(string markup, string? interpretAs)
     {
         return new MarkupAnnotation {
             IsMarkup = true,
