@@ -156,6 +156,21 @@ public class LanguageToolClient
     }
 
     /// <summary>
+    /// Check a markup text with LanguageTool for possible style and grammar issues
+    /// ignoring results matching user words.
+    /// </summary>
+    /// <param name="text">
+    /// The text to be checked, given as a document that specifies what's text and what's markup.
+    /// Markup will be ignored when looking for errors.
+    /// </param>
+    /// <param name="parameters">The parameters to run the check.</param>
+    /// <returns>A list of detected issues.</returns>
+    public async Task<TextCheckResult> CheckMarupTextAsync(MarkupText text, TextCheckParameters parameters)
+    {
+        return await CheckMarkupTextAsync(text.ToRequestBody(), parameters);
+    }
+
+    /// <summary>
     /// Get a list of supported languages.
     /// </summary>
     /// <returns>An array of language objects.</returns>

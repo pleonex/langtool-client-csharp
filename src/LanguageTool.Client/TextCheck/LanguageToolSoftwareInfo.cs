@@ -3,6 +3,9 @@
 using System.Globalization;
 using PleOps.LanguageTool.Client.Generated.Check;
 
+/// <summary>
+/// Information about the LanguageTool software.
+/// </summary>
 public record LanguageToolSoftwareInfo
 {
     internal LanguageToolSoftwareInfo(CheckPostResponse_software response)

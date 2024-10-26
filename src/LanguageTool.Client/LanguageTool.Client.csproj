@@ -6,17 +6,19 @@
     <IsPackable>true</IsPackable>
 
     <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>PleOps.LanguageTool.Client</RootNamespace>
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
-    <!-- Ignore documentation warnings from generated code -->
-    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="$(PackageReadmeFile)" Visible="False" />
     <None Include="languagetool-swagger.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PleOps.LanguageTool.Client.Tests" />
   </ItemGroup>
 
   <ItemGroup>
