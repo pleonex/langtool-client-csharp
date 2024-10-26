@@ -125,7 +125,7 @@ public class LanguageToolClient
             ?? throw new InvalidOperationException("Invalid response data");
 
         // Ignore matches due to words in the user dictionary.
-        IEnumerable<CheckPostResponse_matches> matches = FilterMatchesFromDictionary(response, text);
+        IEnumerable<CheckPostResponse_matches> matches = FilterMatchesFromDictionary(response);
 
         return new TextCheckResult(response, matches);
     }
@@ -150,7 +150,7 @@ public class LanguageToolClient
             ?? throw new InvalidOperationException("Invalid response data");
 
         // Ignore matches due to words in the user dictionary.
-        IEnumerable<CheckPostResponse_matches> matches = FilterMatchesFromDictionary(response, jsonData);
+        IEnumerable<CheckPostResponse_matches> matches = FilterMatchesFromDictionary(response);
 
         return new TextCheckResult(response, matches);
     }
@@ -165,7 +165,7 @@ public class LanguageToolClient
     /// </param>
     /// <param name="parameters">The parameters to run the check.</param>
     /// <returns>A list of detected issues.</returns>
-    public async Task<TextCheckResult> CheckMarupTextAsync(MarkupText text, TextCheckParameters parameters)
+    public async Task<TextCheckResult> CheckMarkupTextAsync(MarkupText text, TextCheckParameters parameters)
     {
         return await CheckMarkupTextAsync(text.ToRequestBody(), parameters);
     }
@@ -182,14 +182,14 @@ public class LanguageToolClient
         return response.Select(l => new LanguageInfo(l.Name!, l.Code!, l.LongCode!));
     }
 
-    private IEnumerable<CheckPostResponse_matches> FilterMatchesFromDictionary(CheckPostResponse response, string input)
+    private IEnumerable<CheckPostResponse_matches> FilterMatchesFromDictionary(CheckPostResponse response)
     {
         var textCulture = new CultureInfo(response.Language!.Code!);
         var comparer = StringComparer.Create(textCulture, ignoreCase: !UserDictionaryCaseSensitive);
         IEnumerable<CheckPostResponse_matches> matches = response.Matches!
             .Where(m => {
-                // Not sure, to be verified.
-                string matchContent = input.Substring(m.Offset!.Value, m.Length!.Value);
+                var context = m.Context!;
+                string matchContent = context.Text!.Substring(context.Offset!.Value, context.Length!.Value);
                 return !userDictionary.Keys.Contains(matchContent, comparer);
             });
 

@@ -11,7 +11,7 @@ public record LanguageToolSoftwareInfo
     internal LanguageToolSoftwareInfo(CheckPostResponse_software response)
     {
         ApiVersion = response.ApiVersion!.Value;
-        BuildDate = DateOnly.ParseExact(response.BuildDate!, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        BuildDate = DateTime.Parse(response.BuildDate!, CultureInfo.InvariantCulture);
         Name = response.Name!;
         Premium = response.Premium!.Value;
         Status = response.Status!;
@@ -26,7 +26,7 @@ public record LanguageToolSoftwareInfo
     /// <summary>
     /// Gets the date when the software was built.
     /// </summary>
-    public DateOnly BuildDate { get; }
+    public DateTime BuildDate { get; }
 
     /// <summary>
     /// Gets the name of the software.

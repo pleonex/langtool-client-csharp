@@ -16,7 +16,8 @@ public record CheckRule
         SubId = response.SubId;
         Description = response.Description!;
         IssueType = response.IssueType;
-        Urls = response.Urls!.Select(u => u.Value!).ToList().AsReadOnly();
+        Urls = response.Urls?.Select(u => u.Value!).ToList().AsReadOnly()
+            ?? new ReadOnlyCollection<string>([]);
     }
 
     /// <summary>
