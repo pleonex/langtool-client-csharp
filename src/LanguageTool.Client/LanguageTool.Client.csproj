@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>PleOps.LanguageTool.Client</AssemblyName>
     <Description>LanguageTool REST API .NET client</Description>
     <IsPackable>true</IsPackable>
 
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>PleOps.LanguageTool.Client</RootNamespace>
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
