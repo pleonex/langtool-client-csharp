@@ -13,7 +13,7 @@ public sealed class BuildLifetime : FrostingLifetime<PleOpsBuildContext>
 {
     public override void Setup(PleOpsBuildContext context, ISetupContext info)
     {
-        //context.DotNetContext.CoverageTarget = 0;
+        context.DotNetContext.CoverageTarget = 0; // no planned full testing
 
         context.ReadArguments();
 
