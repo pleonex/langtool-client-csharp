@@ -40,7 +40,7 @@ your solution file (.sln) with the following content:
   <packageSources>
     <clear/>
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-    <add key="PleOps-Preview" value="https://dev.azure.com/pleonex/Pleosoft/_artifacts/feed/Pleosoft-Preview" />
+    <add key="PleOps-Preview" value="https://pkgs.dev.azure.com/pleonex/Pleosoft/_packaging/Pleosoft-Preview/nuget/v3/index.json" />
   </packageSources>
   <packageSourceMapping>
     <packageSource key="nuget.org">
